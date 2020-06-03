@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 import os
+import pandas as pd
 url=input("Enter craiglist url to scrape for jobs: ")
 web=requests.get(url)
 web=web.text
@@ -11,6 +12,7 @@ import io
 f=io.open("list.txt", "w", encoding="utf-8")
 f.write(file_name+"\n--------------------\n\n")
 x=0
+pizza={}
 while True:
     for job in lolz:
         x+=1
@@ -35,10 +37,12 @@ while True:
         except:
             date="date unavailable"
         if checker==0:
+            pizza[x]=[job_name,date,link,"NONE"]
             pop=("the job is: "+job_name+"\nthe date is: "+date+"\nlink : "+link+"\n-----------------\n")
             f.write(pop)
         else:
             pop=("the job is: "+job_name+"\nthe date is: "+date+"\nthe location is: {}".format(location4)+"\nlink : "+link+"\n-----------------\n")
+            pizza[x]=[job_name,date,link,location4]
             f.write(pop)
         del location4
     try:
@@ -50,6 +54,9 @@ while True:
         lolz = soup.find_all("p")
     except:
         break
+
 job_found="total jobs found: {}".format(x)
 f.write(job_found)
 f.close()
+exel=pd.DataFrame.from_dict(pizza,orient="index",columns=["job name","date","link","location"])
+exel.to_excel("job_list.xls")
