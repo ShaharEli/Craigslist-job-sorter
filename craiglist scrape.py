@@ -7,14 +7,14 @@ web=requests.get(url)
 web=web.text
 soup=BeautifulSoup(web,"html.parser")
 file_name=soup.find("a",{"class":"reset"}).text+" list:"
-lolz=soup.find_all("p")
+links=soup.find_all("p")
 import io
 f=io.open("list.txt", "w", encoding="utf-8")
 f.write(file_name+"\n--------------------\n\n")
 x=0
-pizza={}
+dataDict={}
 while True:
-    for job in lolz:
+    for job in links:
         x+=1
         lop=job.find("a","result-title")
         try:
@@ -37,12 +37,12 @@ while True:
         except:
             date="date unavailable"
         if checker==0:
-            pizza[x]=[job_name,date,link,"NONE"]
+            dataDict[x]=[job_name,date,link,"NONE"]
             pop=("the job is: "+job_name+"\nthe date is: "+date+"\nlink : "+link+"\n-----------------\n")
             f.write(pop)
         else:
             pop=("the job is: "+job_name+"\nthe date is: "+date+"\nthe location is: {}".format(location4)+"\nlink : "+link+"\n-----------------\n")
-            pizza[x]=[job_name,date,link,location4]
+            dataDict[x]=[job_name,date,link,location4]
             f.write(pop)
         del location4
     try:
@@ -51,12 +51,12 @@ while True:
         web=requests.get("https://boston.craigslist.org"+next_page)
         web=web.text
         soup = BeautifulSoup(web, "html.parser")
-        lolz = soup.find_all("p")
+        links = soup.find_all("p")
     except:
         break
 
 job_found="total jobs found: {}".format(x)
 f.write(job_found)
 f.close()
-exel=pd.DataFrame.from_dict(pizza,orient="index",columns=["job name","date","link","location"])
+exel=pd.DataFrame.from_dict(dataDict,orient="index",columns=["job name","date","link","location"])
 exel.to_excel("job_list.xls")
